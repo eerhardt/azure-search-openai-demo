@@ -19,7 +19,7 @@ def load_azd_env():
         if entry["IsDefault"]:
             env_file_path = entry["DotEnvPath"]
     if not env_file_path:
-        raise Exception("No default azd env file found")
+        return  # No default azd env file found; do nothing
     loading_mode = os.getenv("LOADING_MODE_FOR_AZD_ENV_VARS") or "override"
     if loading_mode == "no-override":
         logger.info("Loading azd env from %s, but not overriding existing environment variables", env_file_path)

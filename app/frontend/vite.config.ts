@@ -2,6 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
+const proxyTarget = {
+    target: process.env.BACKEND_HTTPS || process.env.BACKEND_HTTP,
+    changeOrigin: true
+};
+
 export default defineConfig({
     plugins: [react()],
     resolve: {
@@ -28,17 +33,17 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/content/": "http://localhost:50505",
-            "/auth_setup": "http://localhost:50505",
-            "/.auth/me": "http://localhost:50505",
-            "/ask": "http://localhost:50505",
-            "/chat": "http://localhost:50505",
-            "/speech": "http://localhost:50505",
-            "/config": "http://localhost:50505",
-            "/upload": "http://localhost:50505",
-            "/delete_uploaded": "http://localhost:50505",
-            "/list_uploaded": "http://localhost:50505",
-            "/chat_history": "http://localhost:50505"
+            "/content/": proxyTarget,
+            "/auth_setup": proxyTarget,
+            "/.auth/me": proxyTarget,
+            "/ask": proxyTarget,
+            "/chat": proxyTarget,
+            "/speech": proxyTarget,
+            "/config": proxyTarget,
+            "/upload": proxyTarget,
+            "/delete_uploaded": proxyTarget,
+            "/list_uploaded": proxyTarget,
+            "/chat_history": proxyTarget
         }
     }
 });
