@@ -5,6 +5,7 @@ import logging
 import mimetypes
 import os
 import time
+import telemetry
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from pathlib import Path
 from typing import Any, cast
@@ -106,6 +107,8 @@ from prepdocslib.blobmanager import AdlsBlobManager, BlobManager
 from prepdocslib.embeddings import ImageEmbeddings
 from prepdocslib.filestrategy import UploadUserFileStrategy
 from prepdocslib.listfilestrategy import File
+
+telemetry.configure_opentelemetry()
 
 bp = Blueprint("routes", __name__, static_folder="static")
 # Fix Windows registry issue with mimetypes
@@ -811,6 +814,9 @@ def create_app():
                 "fastapi": {"enabled": False},
             }
         )
+
+    # Enable OpenTelemetry instrumentation when either Azure Monitor or OTLP exporter is configured
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") or os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"):
         # This tracks HTTP requests made by aiohttp:
         AioHttpClientInstrumentor().instrument()
         # This tracks HTTP requests made by httpx:

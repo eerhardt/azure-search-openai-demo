@@ -13,6 +13,7 @@ azure-storage-file-datalake
 uvicorn
 aiohttp
 azure-monitor-opentelemetry
+opentelemetry-exporter-otlp-proto-grpc
 opentelemetry-instrumentation-asgi
 opentelemetry-instrumentation-httpx
 opentelemetry-instrumentation-aiohttp-client
