@@ -60,7 +60,7 @@ def configure_global_settings():
 
     # Conditionally required (based on feature flags)
     CONTENT_UNDERSTANDING_ENDPOINT = os.getenv("AZURE_CONTENTUNDERSTANDING_ENDPOINT")
-    AZURE_OPENAI_SERVICE = os.getenv("AZURE_OPENAI_SERVICE")
+    AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
     AZURE_OPENAI_CUSTOM_URL = os.getenv("AZURE_OPENAI_CUSTOM_URL")
     AZURE_OPENAI_CHATGPT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHATGPT_DEPLOYMENT")
     AZURE_OPENAI_CHATGPT_MODEL = os.getenv("AZURE_OPENAI_CHATGPT_MODEL")
@@ -86,11 +86,11 @@ def configure_global_settings():
     openai_client = None
     openai_model = None
     openai_deployment = None
-    if USE_MULTIMODAL and (AZURE_OPENAI_SERVICE or AZURE_OPENAI_CUSTOM_URL) and AZURE_OPENAI_CHATGPT_DEPLOYMENT:
+    if USE_MULTIMODAL and (AZURE_OPENAI_ENDPOINT or AZURE_OPENAI_CUSTOM_URL) and AZURE_OPENAI_CHATGPT_DEPLOYMENT:
         openai_client, _ = setup_openai_client(
             openai_host=OpenAIHost.AZURE_CUSTOM if AZURE_OPENAI_CUSTOM_URL else OpenAIHost.AZURE,
             azure_credential=AZURE_CREDENTIAL,
-            azure_openai_service=AZURE_OPENAI_SERVICE,
+            azure_openai_endpoint=AZURE_OPENAI_ENDPOINT,
             azure_openai_custom_url=AZURE_OPENAI_CUSTOM_URL,
         )
         openai_model = AZURE_OPENAI_CHATGPT_MODEL or AZURE_OPENAI_CHATGPT_DEPLOYMENT

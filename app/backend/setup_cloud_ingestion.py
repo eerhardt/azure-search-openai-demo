@@ -33,7 +33,7 @@ async def setup_cloud_ingestion_strategy(
     """Setup the cloud ingestion strategy with all required services."""
 
     # Get environment variables
-    search_service = os.environ["AZURE_SEARCH_SERVICE"]
+    search_endpoint = os.environ["AZURE_SEARCH_ENDPOINT"]
     index_name = os.environ["AZURE_SEARCH_INDEX"]
     search_user_assigned_identity_resource_id = os.environ["AZURE_SEARCH_USER_ASSIGNED_IDENTITY_RESOURCE_ID"]
     storage_account = os.environ["AZURE_STORAGE_ACCOUNT"]
@@ -59,7 +59,7 @@ async def setup_cloud_ingestion_strategy(
 
     # Setup search info
     search_info = setup_search_info(
-        search_service=search_service,
+        search_endpoint=search_endpoint,
         index_name=index_name,
         azure_credential=azure_credential,
         azure_vision_endpoint=os.getenv("AZURE_VISION_ENDPOINT"),
@@ -81,7 +81,7 @@ async def setup_cloud_ingestion_strategy(
     openai_client, azure_openai_endpoint = setup_openai_client(
         openai_host=OPENAI_HOST,
         azure_credential=azure_credential,
-        azure_openai_service=os.getenv("AZURE_OPENAI_SERVICE"),
+        azure_openai_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         azure_openai_custom_url=os.getenv("AZURE_OPENAI_CUSTOM_URL"),
         azure_openai_api_key=os.getenv("AZURE_OPENAI_API_KEY_OVERRIDE"),
         openai_api_key=clean_key_if_exists(os.getenv("OPENAI_API_KEY")),

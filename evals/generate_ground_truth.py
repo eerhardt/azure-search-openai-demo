@@ -35,7 +35,7 @@ def get_azure_credential():
 
 def get_search_documents(azure_credential, num_search_documents=None) -> str:
     search_client = SearchClient(
-        endpoint=f"https://{os.getenv('AZURE_SEARCH_SERVICE')}.search.windows.net",
+        endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
         index_name=os.getenv("AZURE_SEARCH_INDEX"),
         credential=azure_credential,
     )
@@ -55,7 +55,7 @@ def get_search_documents(azure_credential, num_search_documents=None) -> str:
 def generate_ground_truth_ragas(num_questions=200, num_search_documents=None, kg_file=None):
     azure_credential = get_azure_credential()
     azure_openai_api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "2024-06-01"
-    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.com"
+    azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
     azure_ad_token_provider = get_bearer_token_provider(
         azure_credential, "https://cognitiveservices.azure.com/.default"
     )

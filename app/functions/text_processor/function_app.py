@@ -54,7 +54,7 @@ def configure_global_settings():
 
     # Conditionally required (based on feature flags)
     openai_host_str = os.getenv("OPENAI_HOST", "azure")
-    azure_openai_service = os.getenv("AZURE_OPENAI_SERVICE")
+    azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     azure_openai_custom_url = os.getenv("AZURE_OPENAI_CUSTOM_URL")
     azure_openai_emb_deployment = os.getenv("AZURE_OPENAI_EMB_DEPLOYMENT")
     azure_openai_emb_model_name = os.getenv("AZURE_OPENAI_EMB_MODEL_NAME", "text-embedding-3-large")
@@ -81,14 +81,14 @@ def configure_global_settings():
     # Embedding service (optional)
     embedding_service = None
     if use_vectors:
-        if (azure_openai_service or azure_openai_custom_url) and (
+        if (azure_openai_endpoint or azure_openai_custom_url) and (
             azure_openai_emb_deployment and azure_openai_emb_model_name
         ):
             openai_host = OpenAIHost(openai_host_str)
             openai_client, azure_openai_endpoint = setup_openai_client(
                 openai_host=openai_host,
                 azure_credential=azure_credential,
-                azure_openai_service=azure_openai_service,
+                azure_openai_endpoint=azure_openai_endpoint,
                 azure_openai_custom_url=azure_openai_custom_url,
             )
             embedding_service = setup_embeddings_service(

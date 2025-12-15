@@ -87,7 +87,7 @@ class CitationsMatchedMetric(BaseMetric):
 
 
 def get_openai_config():
-    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.com"
+    azure_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
     azure_deployment = os.environ["AZURE_OPENAI_EVAL_DEPLOYMENT"]
     openai_config = {"azure_endpoint": azure_endpoint, "azure_deployment": azure_deployment}
     # azure-ai-evaluate will call DefaultAzureCredential behind the scenes,

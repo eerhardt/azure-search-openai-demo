@@ -82,17 +82,10 @@ static class Extensions
         where T : IResourceWithEnvironment
     {
         return builder
-            .WithEnvironment(async ctx =>
-            {
-                var openaiUri = new Uri(await openai.Resource.UriExpression.GetValueAsync(default)!);
-                ctx.EnvironmentVariables["AZURE_OPENAI_SERVICE"] = openaiUri.Host.Split('.')[0];
-
-                var searchUri = new Uri(await search.Resource.UriExpression.GetValueAsync(default)!);
-                ctx.EnvironmentVariables["AZURE_SEARCH_SERVICE"] = searchUri.Host.Split('.')[0];
-            })
             .WithEnvironment("AZURE_STORAGE_ACCOUNT", storage.Resource.NameOutputReference)
             .WithEnvironment("AZURE_STORAGE_CONTAINER", content.Resource.BlobContainerName)
             .WithEnvironment("AZURE_SEARCH_INDEX", "gptkbindex")
+            .WithEnvironment("AZURE_SEARCH_ENDPOINT", search.Resource.UriExpression)
             .WithEnvironment("AZURE_OPENAI_ENDPOINT", openai.Resource.UriExpression)
             .WithEnvironment("AZURE_OPENAI_CHATGPT_MODEL", chatModel.Resource.ModelName)
             .WithEnvironment("AZURE_OPENAI_CHATGPT_DEPLOYMENT", chatModel.Resource.DeploymentName)

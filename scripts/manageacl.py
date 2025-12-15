@@ -31,7 +31,7 @@ class ManageAcl:
 
     def __init__(
         self,
-        service_name: str,
+        endpoint: str,
         index_name: str,
         url: str,
         acl_action: str,
@@ -44,8 +44,8 @@ class ManageAcl:
 
         Parameters
         ----------
-        service_name
-            Name of the Azure Search service
+        endpoint
+            Endpoint URL of the Azure Search service
         index_name
             Name of the Azure Search index
         url
@@ -59,7 +59,7 @@ class ManageAcl:
         credentials
             Credentials for the azure search service
         """
-        self.service_name = service_name
+        self.endpoint = endpoint
         self.index_name = index_name
         self.credentials = credentials
         self.url = url
@@ -68,13 +68,12 @@ class ManageAcl:
         self.acl = acl
 
     async def run(self):
-        endpoint = f"https://{self.service_name}.search.windows.net"
         if self.acl_action == "enable_acls":
-            await self.enable_acls(endpoint)
+            await self.enable_acls(self.endpoint)
             return
 
         async with SearchClient(
-            endpoint=endpoint, index_name=self.index_name, credential=self.credentials
+            endpoint=self.endpoint, index_name=self.index_name, credential=self.credentials
         ) as search_client:
             if self.acl_action == "view":
                 await self.view_acl(search_client)
@@ -256,7 +255,7 @@ async def main(args: Any):
         search_credential = AzureKeyCredential(args.search_key)
 
     command = ManageAcl(
-        service_name=os.environ["AZURE_SEARCH_SERVICE"],
+        endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
         index_name=os.environ["AZURE_SEARCH_INDEX"],
         url=args.url,
         acl_action=args.acl_action,

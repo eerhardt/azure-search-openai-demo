@@ -36,9 +36,9 @@ from prepdocslib.strategy import DocumentAction, Strategy
 logger = logging.getLogger("scripts")
 
 
-async def check_search_service_connectivity(search_service: str) -> bool:
+async def check_search_service_connectivity(search_endpoint: str) -> bool:
     """Check if the search service is accessible by hitting the /ping endpoint."""
-    ping_url = f"https://{search_service}.search.windows.net/ping"
+    ping_url = f"{search_endpoint}/ping"
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -233,8 +233,9 @@ if __name__ == "__main__":  # pragma: no cover
     if use_agentic_knowledgebase and OPENAI_HOST not in [OpenAIHost.AZURE, OpenAIHost.AZURE_CUSTOM]:
         raise Exception("Agentic retrieval requires an Azure OpenAI chat completion service")
 
+    search_endpoint = os.environ["AZURE_SEARCH_ENDPOINT"]
     search_info = setup_search_info(
-        search_service=os.environ["AZURE_SEARCH_SERVICE"],
+        search_endpoint=search_endpoint,
         index_name=os.environ["AZURE_SEARCH_INDEX"],
         use_agentic_knowledgebase=use_agentic_knowledgebase,
         knowledgebase_name=os.getenv("AZURE_SEARCH_KNOWLEDGEBASE_NAME"),
@@ -247,8 +248,7 @@ if __name__ == "__main__":  # pragma: no cover
     )
 
     # Check search service connectivity
-    search_service = os.environ["AZURE_SEARCH_SERVICE"]
-    is_connected = loop.run_until_complete(check_search_service_connectivity(search_service))
+    is_connected = loop.run_until_complete(check_search_service_connectivity(search_endpoint))
 
     if not is_connected:
         if os.getenv("AZURE_USE_PRIVATE_ENDPOINT"):
@@ -288,7 +288,7 @@ if __name__ == "__main__":  # pragma: no cover
     openai_client, azure_openai_endpoint = setup_openai_client(
         openai_host=OPENAI_HOST,
         azure_credential=azd_credential,
-        azure_openai_service=os.getenv("AZURE_OPENAI_SERVICE"),
+        azure_openai_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         azure_openai_custom_url=os.getenv("AZURE_OPENAI_CUSTOM_URL"),
         azure_openai_api_key=os.getenv("AZURE_OPENAI_API_KEY_OVERRIDE"),
         openai_api_key=clean_key_if_exists(os.getenv("OPENAI_API_KEY")),
