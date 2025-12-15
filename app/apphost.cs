@@ -1,4 +1,5 @@
 ﻿#:sdk Aspire.AppHost.Sdk@13.1.0
+#:package Aspire.Hosting.Azure.AppContainers@13.1.0
 #:package Aspire.Hosting.Azure.CognitiveServices@13.1.0
 #:package Aspire.Hosting.Azure.Search@13.1.0
 #:package Aspire.Hosting.Azure.Storage@13.1.0
@@ -8,6 +9,8 @@
 using Aspire.Hosting.Azure;
 
 var builder = DistributedApplication.CreateBuilder(args);
+
+builder.AddAzureContainerAppEnvironment("env");
 
 var storage = builder.AddAzureStorage("storage");
 var content = storage.AddBlobContainer("content");
@@ -24,33 +27,46 @@ var backend = builder.AddPythonModule("backend", "./backend", "quart")
     .WithHttpEndpoint(env: "PORT")
     .WithArgs(c =>
     {
-        c.Args.Add("--app");
-        c.Args.Add("main.py");
-
-        c.Args.Add("run");
-
-        var endpoint = ((IResourceWithEndpoints)c.Resource).GetEndpoint("http");
-        c.Args.Add("--port");
-        c.Args.Add(endpoint.Property(EndpointProperty.TargetPort));
-
-        c.Args.Add("--host");
-        if (builder.ExecutionContext.IsPublishMode)
+        // In run mode, set up for local development with hot reload
+        // In publish mode, use a production server
+        if (builder.ExecutionContext.IsRunMode)
         {
-            c.Args.Add("0.0.0.0");
+            c.Args.Add("--app");
+            c.Args.Add("main.py");
+
+            c.Args.Add("run");
+
+            var endpoint = ((IResourceWithEndpoints)c.Resource).GetEndpoint("http");
+            c.Args.Add("--port");
+            c.Args.Add(endpoint.Property(EndpointProperty.TargetPort));
+
+            c.Args.Add("--host");
+            c.Args.Add(endpoint.EndpointAnnotation.TargetHost);
+
+            c.Args.Add("--reload");
         }
         else
         {
-            c.Args.Add(endpoint.EndpointAnnotation.TargetHost);
-        }
+             c.Args.Add("-k");
+             c.Args.Add("uvicorn.workers.UvicornWorker");
 
-        // Add hot reload in non-publish mode
-        if (!builder.ExecutionContext.IsPublishMode)
-        {
-            c.Args.Add("--reload");
+             c.Args.Add("-b");
+             c.Args.Add("0.0.0.0:8000");
+             
+             c.Args.Add("main:app");
         }
     })
     .WithAzureEnvironment(openai, search, storage, content, textEmbedding, chatModel)
-    ;
+    .WithExternalHttpEndpoints()
+    .PublishAsAzureContainerApp((infra, app) =>
+    {
+        var c = app.Template.Containers.Single().Value;
+        if (c != null)
+        {
+            c.Resources.Cpu = 1.0;
+            c.Resources.Memory = "2.0Gi";
+        }
+    });
 
 var frontend = builder.AddViteApp("frontend", "./frontend")
     .WithReference(backend)
@@ -91,6 +107,13 @@ static class Extensions
             .WithEnvironment("AZURE_OPENAI_CHATGPT_DEPLOYMENT", chatModel.Resource.DeploymentName)
             .WithEnvironment("AZURE_OPENAI_EMB_DEPLOYMENT", textEmbedding.Resource.DeploymentName)
             .WithEnvironment("AZURE_OPENAI_EMB_MODEL_NAME", textEmbedding.Resource.ModelName)
-            .WithEnvironment("AZURE_OPENAI_EMB_DIMENSIONS", "3072");
+            .WithEnvironment("AZURE_OPENAI_EMB_DIMENSIONS", "3072")
+            .WithEnvironment(ctx =>
+            {
+                if (ctx.ExecutionContext.IsPublishMode)
+                {
+                    ctx.EnvironmentVariables["RUNNING_IN_PRODUCTION"] = "true";
+                }
+            });
     }
 }

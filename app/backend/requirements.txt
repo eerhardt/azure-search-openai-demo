@@ -114,6 +114,8 @@ googleapis-common-protos==1.72.0
     # via opentelemetry-exporter-otlp-proto-grpc
 grpcio==1.76.0
     # via opentelemetry-exporter-otlp-proto-grpc
+gunicorn==23.0.0
+    # via -r requirements.in
 h11==0.16.0
     # via
     #   httpcore
@@ -335,6 +337,7 @@ opentelemetry-util-http==0.60b0
     #   opentelemetry-instrumentation-wsgi
 packaging==24.1
     # via
+    #   gunicorn
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-flask
 pillow==12.0.0

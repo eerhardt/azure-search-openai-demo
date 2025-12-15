@@ -11,6 +11,7 @@ azure-search-documents==11.7.0b2
 azure-storage-blob
 azure-storage-file-datalake
 uvicorn
+gunicorn
 aiohttp
 azure-monitor-opentelemetry
 opentelemetry-exporter-otlp-proto-grpc
